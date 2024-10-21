@@ -712,6 +712,9 @@ void frankenphp_register_variables_from_request_info(
 /* variables with user defined keys must be registered 'safely' */
 void frankenphp_register_variable_safe(char *key, char *val, size_t val_len,
                                        zval *track_vars_array) {
+  if(val == NULL || key == NULL) {
+	return;
+  }
   size_t new_val_len = val_len;
   if (!should_filter_var ||
       sapi_module.input_filter(PARSE_SERVER, key, &val, new_val_len,

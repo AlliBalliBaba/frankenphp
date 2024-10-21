@@ -89,25 +89,12 @@ static void frankenphp_free_request_context() {
   free(ctx->cookie_data);
   ctx->cookie_data = NULL;
 
-  free(SG(request_info).auth_password);
   SG(request_info).auth_password = NULL;
-
-  free(SG(request_info).auth_user);
   SG(request_info).auth_user = NULL;
-
-  free((char *)SG(request_info).request_method);
   SG(request_info).request_method = NULL;
-
-  free(SG(request_info).query_string);
   SG(request_info).query_string = NULL;
-
-  free((char *)SG(request_info).content_type);
   SG(request_info).content_type = NULL;
-
-  free(SG(request_info).path_translated);
   SG(request_info).path_translated = NULL;
-
-  free(SG(request_info).request_uri);
   SG(request_info).request_uri = NULL;
 }
 
@@ -682,8 +669,9 @@ void frankenphp_release_zend_string(zend_string *z_string) {
 static void
 frankenphp_register_variable_from_request_info(zend_string *zKey, char *value,
                                                zval *track_vars_array) {
-  if (value == NULL) {
-    return;
+  if(value == NULL) {
+    frankenphp_register_trusted_var(zKey, "", 0, track_vars_array);
+  	return;
   }
   frankenphp_register_trusted_var(zKey, value, strlen(value), track_vars_array);
 }

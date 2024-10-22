@@ -668,12 +668,13 @@ void frankenphp_release_zend_string(zend_string *z_string) {
 
 static void
 frankenphp_register_variable_from_request_info(zend_string *zKey, char *value,
+											   bool mustBePresent,
                                                zval *track_vars_array) {
-  if(value == NULL) {
+  if (value != NULL) {
+    frankenphp_register_trusted_var(zKey, value, strlen(value), track_vars_array);
+  } else if (mustBePresent) {
     frankenphp_register_trusted_var(zKey, "", 0, track_vars_array);
-  	return;
   }
-  frankenphp_register_trusted_var(zKey, value, strlen(value), track_vars_array);
 }
 
 void frankenphp_register_variables_from_request_info(
@@ -682,19 +683,19 @@ void frankenphp_register_variables_from_request_info(
     zend_string *auth_user, zend_string *request_method,
     zend_string *request_uri) {
   frankenphp_register_variable_from_request_info(
-      content_type, (char *)SG(request_info).content_type, track_vars_array);
+      content_type, (char *)SG(request_info).content_type, false, track_vars_array);
   frankenphp_register_variable_from_request_info(
-      path_translated, (char *)SG(request_info).path_translated,
+      path_translated, (char *)SG(request_info).path_translated, false,
       track_vars_array);
   frankenphp_register_variable_from_request_info(
-      query_string, SG(request_info).query_string, track_vars_array);
+      query_string, SG(request_info).query_string, true, track_vars_array);
   frankenphp_register_variable_from_request_info(
-      auth_user, (char *)SG(request_info).auth_user, track_vars_array);
+      auth_user, (char *)SG(request_info).auth_user, false, track_vars_array);
   frankenphp_register_variable_from_request_info(
-      request_method, (char *)SG(request_info).request_method,
+      request_method, (char *)SG(request_info).request_method, false,
       track_vars_array);
   frankenphp_register_variable_from_request_info(
-      request_uri, SG(request_info).request_uri, track_vars_array);
+      request_uri, SG(request_info).request_uri,  true, track_vars_array);
 }
 
 /* variables with user defined keys must be registered 'safely' */
